@@ -24,6 +24,7 @@
                 border-radius: 10px;
                 padding: 10px;
                 margin: 3%;
+                transition-duration: 300ms;
             }
             .card_symbol
             {
@@ -69,7 +70,8 @@
                 let card = document.createElement("div");
                 card.setAttribute("id", `${color}${shape}${fill}${number}`);
                 card.setAttribute("class","card");
-                card.setAttribute("onclick","cardClicked(this)");
+                card.setAttribute("onclick","cardClicked(this);");
+                card.setAttribute("selected", "false");
                 for (let i = 0; i < number; i++)
                 {
                     let pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
@@ -128,18 +130,38 @@
 
             function cardClicked(card)
             {
-                selectCard(card);
+                if (card.getAttribute("selected") == "false")
+                {
+                    selectCard(card);
+                }
+                else
+                {
+                    deselectCard(card);
+                }
+                if (selectedCards.length == 3)
+                {
+                    console.log(checkSet(selectedCards[0].getAttribute("id"), selectedCards[1].getAttribute("id"), selectedCards[2].getAttribute("id")));
+                    while (selectedCards.length > 0)
+                    {
+                        deselectCard(selectedCards[0]);
+                    }
+                }
             }
 
             function selectCard(card)
             {
                 selectedCards.push(card);
-                console.log(selectedCards);
-                if (selectedCards.length == 3)
-                {
-                    console.log(checkSet(selectedCards[0].getAttribute("id"), selectedCards[1].getAttribute("id"), selectedCards[2].getAttribute("id")));
-                    selectedCards.length = 0;
-                }
+                console.log("selected " + card);
+                card.style.transform = `rotate(${Math.random() * 20 - 10}deg) scale(1.05, 1.05)`;
+                card.setAttribute("selected", "true");
+            }
+
+            function deselectCard(card)
+            {
+                selectedCards.splice(selectedCards.indexOf(card), 1);
+                console.log("deselected " + card);
+                card.style.transform = `rotate(0deg) scale(1, 1)`;
+                card.setAttribute("selected", "false");
             }
         </script>
     </head>
