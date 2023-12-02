@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+    <head>
+        <style>
+            body
+            {
+                background-color: #23022E;
+                
+            }
+            .all_cards
+            {
+                margin: auto;
+                width: 80%;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-rows: 1fr 1fr 1fr 1fr;
+            }
+            .card
+            {
+                background-color: white;
+                text-align: center;
+                display: inline-flex;
+                justify-content: center;
+                flex-direction: row;
+                border-radius: 10px;
+                padding: 10px;
+                margin: 3%;
+            }
+            .card_symbol
+            {
+                display: flex;
+                width: 30%;
+            }
+        </style>
+        <script>
+            const colors = ["#FEC196","#F75590","#573280"];
+            const shapes = ["M25 5 L 5 45 A 21 21 0 1 0 45 45 L 25 5z", 
+                            "M17 5 L 17 50 L 5 50 L 25 73 L 45 50 L 33 50 L 33 5 L 17 5z",
+                            "M5 52 A 20 20 0 0 0 45 52 L 45 25 A 20 20 0 0 0 5 25 L 5 52z"];
+            const cardIDs = new Set();
+            const selectedCards = [];
+            function initialize()
+            {
+                while (cardIDs.size != 12)
+                {
+                    let id = createUniqueID();
+                    if (!cardIDs.has(id))
+                    {
+                        cardIDs.add(id);
+                    }
+                }
+                for (let id of cardIDs)
+                {
+                    let c = parseInt(id.charAt(0));
+                    let s = parseInt(id.charAt(1));
+                    let f = parseInt(id.charAt(2));
+                    let n = parseInt(id.charAt(3));
+                    console.log(id);
+                    document.getElementById("all-cards").appendChild(createCard(c, s, f, n));
+                }
+            }
+
+            function createUniqueID()
+            {
+                return `${Math.floor(Math.random()*3)}${Math.floor(Math.random()*3)}${Math.floor(Math.random()*3)}${Math.floor(Math.random()*3+1)}`;
+            }
+
+            function createCard(color, shape, fill, number)
+            {
+                let card = document.createElement("div");
+                card.setAttribute("id", `${color}${shape}${fill}${number}`);
+                card.setAttribute("class","card");
+                card.setAttribute("onclick","cardClicked(this)");
+                for (let i = 0; i < number; i++)
+                {
+                    let pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+                    pattern.setAttribute("id", `pattern${i}`);
+                    pattern.setAttribute("width", "7");
+                    pattern.setAttribute("height", "7");
+                    pattern.setAttribute("patternUnits", "userSpaceOnUse");
+
+                    let circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute("cx", "4");
+                    circle.setAttribute("cy", "4");
+                    circle.setAttribute("r", "3");
+                    circle.setAttribute("fill", colors[color]);
+
+                    pattern.appendChild(circle);
+                    pattern.setAttribute('patternTransform',"rotate(30, 0.5, 0.5)");
+
+                    let defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                    defs.appendChild(pattern);
+
+                    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg.appendChild(defs);
+                    svg.classList.add("card_symbol");
+                    svg.setAttribute("viewBox", "0 0 50 75");
+                    let path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    if (fill == 2)
+                    {
+                        path.setAttribute("fill", `url(#pattern${i})`);
+                        path.setAttribute("stroke-width", "1.75");
+                    }
+                    else
+                    {
+                        path.setAttribute("fill", colors[color]);
+                        path.setAttribute("fill-opacity", fill);
+                        path.setAttribute("stroke-width", "1.75");
+                    }
+                    path.setAttribute("stroke", colors[color]);
+                    path.setAttribute("d", shapes[shape]);
+                    svg.appendChild(path);
+                    card.appendChild(svg);
+                }
+                return card;
+            }
+
+            function checkSet(id1, id2, id3)
+            {
+                return ((id1.charAt(0) == id2.charAt(0) && id2.charAt(0) == id3.charAt(0))
+                    || !(id1.charAt(0) == id2.charAt(0) || id2.charAt(0) == id3.charAt(0) || id1.charAt(0) == id3.charAt(0)))
+                    && ((id1.charAt(1) == id2.charAt(1) && id2.charAt(1) == id3.charAt(1))
+                    || !(id1.charAt(1) == id2.charAt(1) || id2.charAt(1) == id3.charAt(1) || id1.charAt(1) == id3.charAt(1)))
+                    && ((id1.charAt(2) == id2.charAt(2) && id2.charAt(2) == id3.charAt(2))
+                    || !(id1.charAt(2) == id2.charAt(2) || id2.charAt(2) == id3.charAt(2) || id1.charAt(2) == id3.charAt(2)))
+                    && ((id1.charAt(3) == id2.charAt(3) && id2.charAt(3) == id3.charAt(3))
+                    || !(id1.charAt(3) == id2.charAt(3) || id2.charAt(3) == id3.charAt(3) || id1.charAt(3) == id3.charAt(3)))
+            }
+
+            function cardClicked(card)
+            {
+                selectCard(card);
+            }
+
+            function selectCard(card)
+            {
+                selectedCards.push(card);
+                console.log(selectedCards);
+                if (selectedCards.length == 3)
+                {
+                    console.log(checkSet(selectedCards[0].getAttribute("id"), selectedCards[1].getAttribute("id"), selectedCards[2].getAttribute("id")));
+                    selectedCards.length = 0;
+                }
+            }
+        </script>
+    </head>
+    <body onload="initialize();">
+        <div id="all-cards" class="all_cards">
+        </div>
+    </body>
+</html>
